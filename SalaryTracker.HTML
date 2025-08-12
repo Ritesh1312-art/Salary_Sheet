@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Sheet by Ritesh Gupta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 90%;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+        .yellow-row td {
+            background-color: #fff9c4 !important; /* Sunday */
+        }
+        .blue-row td {
+            background-color: #b3e5fc !important; /* Festival */
+        }
+        input[type="time"], input[type="text"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: none;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 4px;
+            width: 100%;
+        }
+        .developer-credit {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        .save-btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .save-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .save-btn:active {
+            transform: translateY(0);
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div id="notification" class="notification">Data Saved Successfully!</div>
+
+    <div class="container">
+        <div class="developer-credit">Developed by Ritesh Gupta</div>
+        
+        <!-- Main Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <!-- Month Select -->
+            <div class="flex flex-col">
+                <label for="month-select" class="font-bold mb-1">Month</label>
+                <select id="month-select" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+            </div>
+            <!-- Year Select -->
+            <div class="flex flex-col">
+                <label for="year-select" class="font-bold mb-1">Year</label>
+                <select id="year-select" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                </select>
+            </div>
+            <!-- Salary Amount -->
+            <div class="flex flex-col">
+                <label for="salary-amount" class="font-bold mb-1">Salary</label>
+                <input type="number" id="salary-amount" value="30000" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <!-- Default Time In -->
+            <div class="flex flex-col">
+                <label for="default-time-in" class="font-bold mb-1">Time In</label>
+                <input type="time" id="default-time-in" value="09:00" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <!-- Default Time Out -->
+            <div class="flex flex-col">
+                <label for="default-time-out" class="font-bold mb-1">Time Out</label>
+                <input type="time" id="default-time-out" value="18:30" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+
+        <!-- Main Data Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Time In</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Time Out</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Overtime</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Salary Cut</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Remark</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Calendar rows will be injected here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-center">
+            <button id="save-btn" class="save-btn">Save Data</button>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                <div class="font-bold text-gray-700">Total Salary</div>
+                <div id="total-salary-label" class="mt-2 text-2xl font-bold">₹0.00</div>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                <div class="font-bold text-gray-700">Total Overtime Pay</div>
+                <div id="total-overtime-pay-label" class="mt-2 text-2xl font-bold text-green-600">₹0.00</div>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                <div class="font-bold text-gray-700">Total Salary Cut</div>
+                <div id="total-salary-cut-label" class="mt-2 text-2xl font-bold text-red-600">₹0.00</div>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                <div class="font-bold text-gray-700">Grand Total</div>
+                <div id="grand-total-label" class="mt-2 text-3xl font-bold text-blue-600">₹0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Festival dates as an object with year and month as keys
+        const festivalDates = {
+            '2025': {
+                '0': [26], // January 26 (Republic Day)
+                '2': [8],  // March 8 (Holi)
+                '9': [20]  // October 20 (Diwali)
+            },
+            '2026': {
+                '0': [26],
+                '2': [27],
+                '10': [9]
+            }
+        };
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        // DOM Elements
+        const monthSelect = document.getElementById('month-select');
+        const yearSelect = document.getElementById('year-select');
+        const salaryAmountInput = document.getElementById('salary-amount');
+        const defaultTimeInInput = document.getElementById('default-time-in');
+        const defaultTimeOutInput = document.getElementById('default-time-out');
+        const calendarBody = document.getElementById('calendar-body');
+        const saveBtn = document.getElementById('save-btn');
+        const notification = document.getElementById('notification');
+        
+        // Summary Labels
+        const totalSalaryLabel = document.getElementById('total-salary-label');
+        const totalOvertimePayLabel = document.getElementById('total-overtime-pay-label');
+        const totalSalaryCutLabel = document.getElementById('total-salary-cut-label');
+        const grandTotalLabel = document.getElementById('grand-total-label');
+        
+        // Local storage key
+        const STORAGE_KEY = 'salarySheetData_v2';
+        
+        // Set current month and year on load
+        const today = new Date();
+        monthSelect.value = today.getMonth();
+        yearSelect.value = today.getFullYear();
+        
+        // Main function to render the calendar
+        function renderCalendar() {
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Clear previous rows
+            calendarBody.innerHTML = '';
+            
+            // Load saved data for this month
+            const savedData = loadDataForMonth(year, month);
+            
+            // Create rows for each day of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                const dayOfWeek = currentDate.getDay();
+                const dayName = dayNames[dayOfWeek];
+
+                const isSunday = dayOfWeek === 0;
+                const isFestival = (festivalDates[year] && festivalDates[year][month] && festivalDates[year][month].includes(day));
+                
+                const row = document.createElement('tr');
+                if (isSunday) {
+                    row.classList.add('yellow-row');
+                } else if (isFestival) {
+                    row.classList.add('blue-row');
+                }
+
+                // Date Cell
+                const dateCell = document.createElement('td');
+                dateCell.textContent = `${day} ${monthNames[month]} ${year}`;
+                row.appendChild(dateCell);
+
+                // Day Cell
+                const dayCell = document.createElement('td');
+                dayCell.textContent = dayName;
+                row.appendChild(dayCell);
+
+                // Time In Cell
+                const timeInCell = document.createElement('td');
+                const timeInInput = document.createElement('input');
+                timeInInput.type = 'time';
+                timeInInput.value = savedData[day]?.timeIn || defaultTimeInInput.value;
+                timeInInput.classList.add('time-in');
+                timeInInput.dataset.day = day;
+                timeInInput.addEventListener('change', handleInputChange);
+                timeInCell.appendChild(timeInInput);
+                row.appendChild(timeInCell);
+
+                // Time Out Cell
+                const timeOutCell = document.createElement('td');
+                const timeOutInput = document.createElement('input');
+                timeOutInput.type = 'time';
+                timeOutInput.value = savedData[day]?.timeOut || defaultTimeOutInput.value;
+                timeOutInput.classList.add('time-out');
+                timeOutInput.dataset.day = day;
+                timeOutInput.addEventListener('change', handleInputChange);
+                timeOutCell.appendChild(timeOutInput);
+                row.appendChild(timeOutCell);
+
+                // Overtime Cell
+                const overtimeCell = document.createElement('td');
+                overtimeCell.id = `overtime-${day}`;
+                overtimeCell.textContent = savedData[day]?.overtime || '00:00';
+                row.appendChild(overtimeCell);
+
+                // Salary Cut Cell
+                const salaryCutCell = document.createElement('td');
+                salaryCutCell.id = `salary-cut-${day}`;
+                salaryCutCell.textContent = savedData[day]?.salaryCut || '00:00';
+                row.appendChild(salaryCutCell);
+
+                // Remark Cell
+                const remarkCell = document.createElement('td');
+                const remarkInput = document.createElement('input');
+                remarkInput.type = 'text';
+                remarkInput.value = savedData[day]?.remark || (isFestival ? 'Festival' : '');
+                remarkInput.classList.add('remark');
+                remarkInput.dataset.day = day;
+                remarkInput.addEventListener('input', handleRemarkChange);
+                remarkCell.appendChild(remarkInput);
+                row.appendChild(remarkCell);
+
+                calendarBody.appendChild(row);
+            }
+            
+            updateCalculations();
+        }
+
+        // Handle time input changes
+        function handleInputChange(e) {
+            updateCalculations();
+            autoSaveData();
+        }
+
+        // Handle remark changes
+        function handleRemarkChange(e) {
+            const day = parseInt(e.target.dataset.day);
+            const row = e.target.closest('tr');
+            const remark = e.target.value.toLowerCase();
+            
+            // Check if we should add/remove festival color
+            if (remark.includes('festival')) {
+                row.classList.add('blue-row');
+            } else if (!row.classList.contains('yellow-row')) {
+                row.classList.remove('blue-row');
+            }
+            
+            updateCalculations();
+            autoSaveData();
+        }
+
+        // Convert time string to minutes
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // Convert minutes to time string (HH:MM)
+        function minutesToTime(totalMinutes) {
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = Math.round(totalMinutes % 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+        
+        // Update all calculations
+        function updateCalculations() {
+            const salary = parseFloat(salaryAmountInput.value) || 0;
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const dailySalary = salary / daysInMonth;
+
+            const requiredWorkMinutes = 9.5 * 60; // 9 hours 30 minutes
+            
+            let totalOvertimeMinutes = 0;
+            let totalSalaryCutMinutes = 0;
+            let totalOvertimePay = 0;
+            let totalSalaryCutPay = 0;
+            let extraHolidayPay = 0;
+
+            const allRows = calendarBody.querySelectorAll('tr');
+
+            allRows.forEach((row, index) => {
+                const day = index + 1;
+                const timeIn = row.querySelector('.time-in').value;
+                const timeOut = row.querySelector('.time-out').value;
+                const remark = row.querySelector('.remark').value.toLowerCase();
+
+                if (!timeIn || !timeOut) return;
+
+                const timeInMinutes = timeToMinutes(timeIn);
+                const timeOutMinutes = timeToMinutes(timeOut);
+                
+                let actualWorkMinutes = timeOutMinutes - timeInMinutes;
+                
+                // Handle overnight shifts
+                if (actualWorkMinutes < 0) {
+                    actualWorkMinutes += 24 * 60;
+                }
+
+                let overtimeMinutes = 0;
+                let salaryCutMinutes = 0;
+
+                if (actualWorkMinutes > requiredWorkMinutes) {
+                    overtimeMinutes = actualWorkMinutes - requiredWorkMinutes;
+                    totalOvertimeMinutes += overtimeMinutes;
+                } else if (actualWorkMinutes < requiredWorkMinutes) {
+                    salaryCutMinutes = requiredWorkMinutes - actualWorkMinutes;
+                    totalSalaryCutMinutes += salaryCutMinutes;
+                }
+
+                // Update Overtime and Salary Cut cells
+                document.getElementById(`overtime-${day}`).textContent = minutesToTime(overtimeMinutes);
+                document.getElementById(`salary-cut-${day}`).textContent = minutesToTime(salaryCutMinutes);
+
+                // Check for Sunday/Festival pay
+                const isSunday = row.classList.contains('yellow-row');
+                const isFestival = remark.includes('festival') || row.classList.contains('blue-row');
+
+                if ((isSunday || isFestival) && (timeIn !== defaultTimeInInput.value || timeOut !== defaultTimeOutInput.value)) {
+                    extraHolidayPay += dailySalary;
+                }
+            });
+
+            // Calculate overtime pay
+            const overtimePayPerHour = (salary / daysInMonth / 9.5);
+            totalOvertimePay = (totalOvertimeMinutes / 60) * overtimePayPerHour + extraHolidayPay;
+
+            // Calculate salary cut pay
+            const salaryCutPayPerHour = (salary / daysInMonth / 9.5);
+            totalSalaryCutPay = (totalSalaryCutMinutes / 60) * salaryCutPayPerHour;
+
+            const grandTotal = salary + totalOvertimePay - totalSalaryCutPay;
+
+            // Update summary labels
+            totalSalaryLabel.textContent = `₹${salary.toFixed(2)}`;
+            totalOvertimePayLabel.textContent = `₹${totalOvertimePay.toFixed(2)}`;
+            totalSalaryCutLabel.textContent = `₹${totalSalaryCutPay.toFixed(2)}`;
+            grandTotalLabel.textContent = `₹${grandTotal.toFixed(2)}`;
+        }
+
+        // Save data to local storage
+        function saveData() {
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const monthData = {};
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const row = calendarBody.querySelector(`tr:nth-child(${day})`);
+                if (!row) continue;
+                
+                monthData[day] = {
+                    timeIn: row.querySelector('.time-in').value,
+                    timeOut: row.querySelector('.time-out').value,
+                    overtime: document.getElementById(`overtime-${day}`).textContent,
+                    salaryCut: document.getElementById(`salary-cut-${day}`).textContent,
+                    remark: row.querySelector('.remark').value
+                };
+            }
+            
+            // Get all saved data
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            // Update with current month's data
+            allData[`${year}-${month}`] = monthData;
+            // Save back to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+            
+            showNotification('Data Saved Successfully!');
+        }
+
+        // Auto-save data when changes are made
+        function autoSaveData() {
+            saveData();
+        }
+
+        // Load data for current month
+        function loadDataForMonth(year, month) {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            if (!allData) return {};
+            
+            return allData[`${year}-${month}`] || {};
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.style.backgroundColor = '#10b981';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event listeners
+        monthSelect.addEventListener('change', renderCalendar);
+        yearSelect.addEventListener('change', renderCalendar);
+        salaryAmountInput.addEventListener('input', updateCalculations);
+        defaultTimeInInput.addEventListener('change', function() {
+            // Update all time in fields that match the previous default
+            const prevDefault = this.defaultValue;
+            const newValue = this.value;
+            
+            document.querySelectorAll('.time-in').forEach(input => {
+                if (input.value === prevDefault) {
+                    input.value = newValue;
+                }
+            });
+            
+            updateCalculations();
+            autoSaveData();
+        });
+        
+        defaultTimeOutInput.addEventListener('change', function() {
+            // Update all time out fields that match the previous default
+            const prevDefault = this.defaultValue;
+            const newValue = this.value;
+            
+            document.querySelectorAll('.time-out').forEach(input => {
+                if (input.value === prevDefault) {
+                    input.value = newValue;
+                }
+            });
+            
+            updateCalculations();
+            autoSaveData();
+        });
+        
+        // Save button event listener
+        saveBtn.addEventListener('click', saveData);
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', renderCalendar);
+    </script>
+</body>
+</html>
